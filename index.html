@@ -1,0 +1,989 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tricky Dick MC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: the Oval Office crossed with a 1984 block party — typewritten transcripts on top, a mixing desk below */
+:root {
+  --navy: #0f1830; --panel: #172342; --panel2: #1f2e55; --line: #2f4170; --fg: #f1ead8; --muted: #a8b2cc;
+  --gold: #d6a92e; --gold-lt: #f2cd5c; --red: #d2402f; --paper: #efe4c6; --ink: #1d1a14; --blue: #6f9ce0;
+  --display: 'Bungee', Impact, sans-serif; --type: 'Courier Prime', 'Courier New', monospace; --sans: 'IBM Plex Sans', system-ui, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--navy); color: var(--fg); font: 16px/1.5 var(--sans); }
+.wrap { max-width: 960px; margin: 0 auto; padding: 36px max(16px, env(safe-area-inset-right, 0px)) 80px max(16px, env(safe-area-inset-left, 0px)); display: grid; gap: 34px; }
+header { display: grid; gap: 6px; }
+h1 { font: 400 clamp(42px, 9vw, 86px)/.95 var(--display); margin: 0; color: var(--gold-lt); letter-spacing: 1px; text-shadow: 4px 4px 0 var(--red); }
+.tag { font: italic 18px var(--type); color: var(--muted); margin: 6px 0 0; }
+h2 { font: 400 26px/1.1 var(--display); margin: 0 0 4px; color: var(--fg); display: flex; gap: 12px; align-items: baseline; }
+h2 .n { font: 700 14px var(--type); color: var(--red); }
+.sub { color: var(--muted); font-size: 14px; margin: 0; }
+.bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.tapes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 680px) { .tapes { grid-template-columns: 1fr; } }
+.tape { background: var(--paper); color: var(--ink); border-radius: 3px; padding: 14px 14px 12px; display: grid; gap: 8px; position: relative; box-shadow: 0 2px 0 rgba(0,0,0,.25); min-height: 120px; }
+.tape.hook { outline: 3px solid var(--gold); }
+.tape.live { box-shadow: 0 0 0 3px var(--red); }
+.tape q { font: 700 19px/1.35 var(--type); quotes: none; overflow-wrap: anywhere; }
+.tape .when { font: 400 19px/1.35 var(--type); }
+.tape .ctx { font: 13px/1.4 var(--type); color: #5b5446; }
+.tape .ctx a { color: #5b5446; }
+.tape .acts { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.tape .num { position: absolute; top: 8px; right: 10px; font: 700 12px var(--type); color: #8a8170; }
+.chip { font: 700 12px var(--type); letter-spacing: .5px; background: transparent; color: var(--ink); border: 1.5px solid var(--ink); border-radius: 999px; padding: 3px 10px; cursor: pointer; }
+.chip:hover { background: rgba(0,0,0,.07); }
+.chip.on { background: var(--ink); color: var(--paper); }
+.skel { background: var(--panel); border-radius: 3px; min-height: 120px; display: grid; place-items: center; color: var(--muted); font: 14px var(--type); border: 1px dashed var(--line); }
+.btn { font: 400 18px var(--display); letter-spacing: 1px; background: var(--gold); color: var(--ink); border: 0; border-radius: 4px; padding: 12px 22px; cursor: pointer; box-shadow: 3px 3px 0 var(--red); }
+.btn:hover { background: var(--gold-lt); } .btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--red); }
+.btn:disabled { opacity: .5; cursor: progress; transform: none; }
+.btn.ghost { background: var(--panel2); color: var(--fg); box-shadow: none; font: 600 15px var(--sans); letter-spacing: 0; padding: 10px 16px; border: 1px solid var(--line); }
+.btn.ghost:hover { border-color: var(--gold); }
+button:focus-visible, input:focus-visible, a:focus-visible { outline: 2px solid var(--gold-lt); outline-offset: 2px; }
+#status { font: 14px var(--type); color: var(--gold-lt); min-height: 1.4em; }
+#status.err { color: #ff9c8c; }
+.knobs { display: grid; gap: 22px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 22px 20px; }
+.slider { display: grid; grid-template-columns: 150px minmax(0, 1fr) 150px; gap: 16px; align-items: center; }
+.slider span { font: 700 15px var(--type); text-transform: uppercase; letter-spacing: .5px; color: var(--muted); }
+.slider span:last-child { text-align: right; }
+@media (max-width: 560px) { .slider { grid-template-columns: 1fr 1fr; gap: 6px 10px; } .slider input { grid-column: 1 / -1; grid-row: 2; } }
+input[type=range] { width: 100%; accent-color: var(--gold); height: 26px; cursor: pointer; }
+.deck { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 18px; display: grid; gap: 14px; }
+.titlebar { display: flex; gap: 16px; align-items: center; }
+.reels { display: flex; gap: 6px; flex: none; }
+.reel { width: 42px; height: 42px; border-radius: 50%; border: 3px solid var(--gold); background: repeating-conic-gradient(var(--panel2) 0 40deg, var(--navy) 40deg 60deg); }
+.spinning .reel { animation: spin 1.6s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.titlebar h3 { font: 400 clamp(22px, 4vw, 32px)/1.1 var(--display); margin: 0; color: var(--gold-lt); overflow-wrap: anywhere; }
+.titlebar p { margin: 2px 0 0; font: 14px var(--type); color: var(--muted); }
+canvas { width: 100%; height: 210px; display: block; background: #0b1226; border-radius: 4px; cursor: pointer; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font: 12px var(--type); color: var(--muted); }
+.legend span::before { content: ''; display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; background: var(--c); }
+.transport { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.time { font: 14px var(--type); color: var(--muted); font-variant-numeric: tabular-nums; margin-right: auto; }
+.pads { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+
+.pad { font: 400 17px var(--display); letter-spacing: .5px; background: var(--red); color: var(--fg); border: 0; border-radius: 6px; padding: 16px 10px; cursor: pointer; box-shadow: inset 0 -4px 0 rgba(0,0,0,.3); display: grid; gap: 2px; }
+.pad small { font: 12px var(--type); opacity: .85; letter-spacing: 0; }
+.pad:active, .pad.hit { transform: translateY(2px); box-shadow: inset 0 -1px 0 rgba(0,0,0,.3); filter: brightness(1.15); }
+.pads.fx { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.pads.fx .pad { background: var(--blue); color: var(--ink); }
+.padlabel { margin: 2px 0 -4px; font: 700 12px var(--type); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
+@media (max-width: 560px) { .pads, .pads.fx { grid-template-columns: 1fr 1fr; } }
+.note { font-size: 13px; color: var(--muted); }
+.note a { color: var(--blue); }
+@media (prefers-reduced-motion: reduce) { .spinning .reel { animation: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Tricky Dick MC</h1>
+    <p class="tag" id="tagline">I am not a crook. I'm an MC.</p>
+  </header>
+
+  <section>
+    <h2><span class="n">01</span>The tapes</h2>
+    <div class="bar"><p class="sub">Six lines from Nixon’s speeches and the White House tapes, transcribed on your computer. Pick the hook.</p><button class="btn ghost" id="newTapes" type="button">↻ New tapes</button></div>
+    <div class="tapes" id="tapes"></div>
+  </section>
+
+  <section>
+    <h2><span class="n">02</span>Cut the record</h2>
+    <div class="knobs" id="knobs"></div>
+  </section>
+
+  <section>
+    <h2><span class="n">03</span>On the decks</h2>
+    <div class="transport" style="margin-bottom:14px"><button class="btn" id="compose" type="button" disabled>Press the record</button><div id="status" role="status" aria-live="polite"></div></div>
+    <div class="deck">
+      <div class="titlebar" id="titlebar"><div class="reels" aria-hidden="true"><div class="reel"></div><div class="reel"></div></div><div><h3 id="trackTitle">No record yet</h3><p id="trackSub">Wait for six lines, then press the record.</p></div></div>
+      <canvas id="tl" width="1840" height="420" aria-label="Track timeline"></canvas>
+      <div class="legend" id="legend"></div>
+      <div class="transport">
+        <button class="btn ghost" id="play" type="button" disabled>▶ Play</button>
+        <span class="time" id="time">0:00 / 0:00</span>
+        <button class="btn ghost" id="vary" type="button" disabled>New mix</button>
+        <button class="btn ghost" id="wav" type="button" disabled>Download WAV</button>
+      </div>
+      <p class="padlabel">Scratches</p>
+      <div class="pads">
+        <button class="pad" data-scratch="baby" type="button">Baby scratch<small>Z</small></button>
+        <button class="pad" data-scratch="stretch" type="button">Rose Mary stretch<small>X</small></button>
+        <button class="pad" data-scratch="chirp" type="button">Wiretap chirp<small>C</small></button>
+        <button class="pad" data-scratch="flare" type="button">Flare<small>V</small></button>
+        <button class="pad" data-scratch="scribble" type="button">Scribble<small>B</small></button>
+        <button class="pad" data-scratch="tear" type="button">Tear<small>N</small></button>
+      </div>
+      <p class="padlabel">Effects</p>
+      <div class="pads fx">
+        <button class="pad" data-fx="siren" type="button">Motorcade siren<small>1</small></button>
+        <button class="pad" data-fx="horn" type="button">Air horn<small>2</small></button>
+        <button class="pad" data-fx="laser" type="button">Laser zap<small>3</small></button>
+        <button class="pad" data-fx="rewind" type="button">Rewind<small>4 · pull it up</small></button>
+      </div>
+      <p class="note">Pads land on the next beat while the record plays. Scratches cut up the line you just heard; Rewind spins the record back and drops it in again from the top of the section.</p>
+    </div>
+    <p class="note" id="credits"></p>
+  </section>
+</div>
+<script>
+// ===================== ANALYSIS =====================
+const SR = 44100;
+function rng(seed) { let a = seed >>> 0; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+
+function toMono(buf, maxSec = 600) {
+  const n = Math.min(buf.length, Math.floor(maxSec * buf.sampleRate)); const out = new Float32Array(n);
+  for (let c = 0; c < buf.numberOfChannels; c++) { const d = buf.getChannelData(c); for (let i = 0; i < n; i++) out[i] += d[i] / buf.numberOfChannels; }
+  return { data: out, sr: buf.sampleRate };
+}
+function pitchAt(d, sr, center) {
+  const N = 2048, s = Math.max(0, Math.floor(center - N / 2)); if (s + N * 1.5 > d.length) return 0;
+  const minL = Math.floor(sr / 320), maxL = Math.floor(sr / 65); let best = 0, bestL = 0, e0 = 0;
+  for (let i = 0; i < N; i++) e0 += d[s + i] * d[s + i]; if (e0 < 1e-6) return 0;
+  for (let L = minL; L <= maxL; L++) { let c = 0, e1 = 0; for (let i = 0; i < N; i++) { c += d[s + i] * d[s + i + L]; e1 += d[s + i + L] * d[s + i + L]; } const r = c / Math.sqrt(e0 * e1 + 1e-9); if (r > best) { best = r; bestL = L; } }
+  return best > .45 ? sr / bestL : 0;
+}
+// Find spoken phrases (0.5–3.2 s) and single words (0.12–0.8 s)
+function segment(buf, srcIndex) {
+  const { data: d, sr } = toMono(buf); const hop = Math.floor(sr * .01), win = hop * 2;
+  const rms = []; for (let i = 0; i + win < d.length; i += hop) { let s = 0; for (let k = 0; k < win; k++) s += d[i + k] * d[i + k]; rms.push(Math.sqrt(s / win)); }
+  const sorted = rms.slice().sort((a, b) => a - b); const p20 = sorted[Math.floor(sorted.length * .2)], p95 = sorted[Math.floor(sorted.length * .95)];
+  const thr = Math.max(p20 * 2.2, p95 * .12, 1e-4);
+  const regions = (minGap) => { const out = []; let st = -1, lastOn = -1; for (let i = 0; i < rms.length; i++) { if (rms[i] > thr) { if (st < 0) st = i; lastOn = i; } else if (st >= 0 && i - lastOn > minGap) { out.push([st, lastOn + 1]); st = -1; } } if (st >= 0) out.push([st, lastOn + 1]); return out; };
+  const mk = ([a, b], kind) => { let e = 0; for (let i = a; i < b; i++) e += rms[i]; const s = a * hop, en = b * hop; return { src: srcIndex, kind, start: Math.max(0, s - hop * 3), end: Math.min(d.length, en + hop * 4), level: e / (b - a), f0: pitchAt(d, sr, (s + en) / 2) }; };
+  const phrases = []; for (const r of regions(22)) {
+    let [a, b] = r; const len = (b - a) / 100;
+    if (len < .5) continue;
+    while ((b - a) / 100 > 3.2) { // cut long runs at the quietest point between 1.2 and 3 s
+      let mi = a + 120, mv = 1e9; for (let i = a + 120; i < a + 300 && i < b; i++) if (rms[i] < mv) { mv = rms[i]; mi = i; }
+      phrases.push(mk([a, mi], 'phrase')); a = mi;
+    }
+    if ((b - a) / 100 >= .5) phrases.push(mk([a, b], 'phrase'));
+  }
+  const words = regions(5).filter(([a, b]) => (b - a) >= 12 && (b - a) <= 80).map(r => mk(r, 'word'));
+  // passages: whole sentences (4–10 s) that start and end at a real pause, used for the clear, recognizable moment
+  const passages = []; const base = regions(22); let i = 0;
+  while (i < base.length) {
+    if (i > 0 && base[i][0] - base[i - 1][1] < 35) { i++; continue; } // must begin after a pause of 0.35 s or more
+    let j = i;
+    while (j + 1 < base.length && base[j + 1][0] - base[j][1] < 70 && base[j + 1][1] - base[i][0] <= 1000) {
+      j++; const len = base[j][1] - base[i][0], next = base[j + 1];
+      if (len >= 400 && (!next || next[0] - base[j][1] >= 40)) break; // 4 s+ and a sentence-ish pause follows
+    }
+    const len = (base[j][1] - base[i][0]) / 100;
+    if (len >= 3 && len <= 10) passages.push(mk([base[i][0], base[j][1]], 'passage'));
+    i = j + 1;
+  }
+  return { phrases, words, passages, sr, mono: d };
+}
+function sliceBuffer(mono, sr, s, e, reverse = false) {
+  const n = Math.max(32, e - s), fade = Math.min(Math.floor(sr * .012), n >> 2);
+  const b = new AudioBuffer({ length: n, sampleRate: sr, numberOfChannels: 1 }); const o = b.getChannelData(0);
+  for (let i = 0; i < n; i++) { let g = 1; if (i < fade) g = i / fade; else if (i > n - fade) g = (n - i) / fade; o[reverse ? n - 1 - i : i] = (mono[s + i] || 0) * g; }
+  return b;
+}
+function score(seg, deep) {
+  const len = (seg.end - seg.start) / SR; let s = seg.level * 10 + (seg.kind === 'phrase' ? -Math.abs(len - 1.6) * .3 : -Math.abs(len - .4) * .6);
+  if (seg.f0) { s += .4; if (deep && seg.f0 >= 75 && seg.f0 <= 170) s += .9; if (deep && seg.f0 > 190) s -= .6; }
+  return s;
+}
+
+const revCache = new WeakMap();
+function reverseOf(b) { if (revCache.has(b)) return revCache.get(b); const r = new AudioBuffer({ length: b.length, sampleRate: b.sampleRate, numberOfChannels: 1 }); const s = b.getChannelData(0), d = r.getChannelData(0); for (let i = 0; i < s.length; i++) d[i] = s[s.length - 1 - i]; revCache.set(b, r); return r; }
+function truncate(b, frac) { const n = Math.max(64, Math.floor(b.length * frac)); const r = new AudioBuffer({ length: n, sampleRate: b.sampleRate, numberOfChannels: 1 }); const s = b.getChannelData(0), d = r.getChannelData(0); const f = Math.min(600, n >> 2); for (let i = 0; i < n; i++) d[i] = s[i] * (i > n - f ? (n - i) / f : 1); return r; }
+
+function toWav(buf) {
+  const n = buf.length, ch = buf.numberOfChannels, out = new DataView(new ArrayBuffer(44 + n * ch * 2));
+  const w = (o, s) => { for (let i = 0; i < s.length; i++) out.setUint8(o + i, s.charCodeAt(i)); };
+  w(0, 'RIFF'); out.setUint32(4, 36 + n * ch * 2, true); w(8, 'WAVEfmt '); out.setUint32(16, 16, true); out.setUint16(20, 1, true); out.setUint16(22, ch, true);
+  out.setUint32(24, buf.sampleRate, true); out.setUint32(28, buf.sampleRate * ch * 2, true); out.setUint16(32, ch * 2, true); out.setUint16(34, 16, true); w(36, 'data'); out.setUint32(40, n * ch * 2, true);
+  const chans = [...Array(ch)].map((_, c) => buf.getChannelData(c)); let o = 44;
+  for (let i = 0; i < n; i++) for (let c = 0; c < ch; c++) { const v = Math.max(-1, Math.min(1, chans[c][i])); out.setInt16(o, v < 0 ? v * 0x8000 : v * 0x7fff, true); o += 2; }
+  return new Blob([out], { type: 'audio/wav' });
+}
+
+// ===================== TRACK NAMING =====================
+// Transcribes the first clear passage with Whisper running locally in the browser (open model, no account or AI service),
+// then lifts a short, striking phrase from the words to use as the title.
+const ASR_MODEL = 'Xenova/whisper-base.en';
+let asrPromise = null;
+function loadASR(onProgress) {
+  if (!asrPromise) asrPromise = (async () => {
+    const tf = await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.0.2');
+    const seen = {};
+    return tf.pipeline('automatic-speech-recognition', ASR_MODEL, {
+      progress_callback: p => { if (p.status === 'progress' && p.total) { seen[p.file] = [p.loaded, p.total]; const v = Object.values(seen); const l = v.reduce((a, x) => a + x[0], 0), t = v.reduce((a, x) => a + x[1], 0); onProgress?.(l / t, t); } }
+    });
+  })().catch(e => { asrPromise = null; throw e; });
+  return asrPromise;
+}
+async function transcribe(mono, sr, start, end, onProgress) {
+  const n = end - start; const b = new AudioBuffer({ length: n, sampleRate: sr, numberOfChannels: 1 }); b.copyToChannel(mono.subarray(start, end), 0);
+  const off = new OfflineAudioContext(1, Math.ceil(n / sr * 16000), 16000); const s = off.createBufferSource(); s.buffer = b; s.connect(off.destination); s.start(0);
+  const pcm = (await off.startRendering()).getChannelData(0);
+  const asr = await loadASR(onProgress);
+  const r = await asr(pcm);
+  return (r.text || '').replace(/\[[^\]]*\]|\([^)]*\)/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+const STOP = new Set(('a an the and or but if so of to in on at by for from with as is are was were be been being am do does did have has had i you he she it we they me him her us them my your his its our their this that these those there here what which who whom whose when where why how not no yes than then just very can could will would shall should may might must also too up down out over about into all any some such only own same both each few more most other s t don now well oh uh um let lets let\'s i\'m you\'re we\'re it\'s that\'s there\'s going get got go want wanted know think say said tell told make made see thing things way really like one two'.split(' ')));
+const TITLE_SMALL = new Set('a an the and or but of to in on at by for from with as'.split(' '));
+function titleFrom(text, R = Math.random) {
+  const sentences = text.split(/(?<=[.!?])\s+/);
+  let best = null;
+  sentences.forEach(sent => {
+    const w = sent.replace(/[^A-Za-z0-9'\s-]/g, '').split(/\s+/).filter(Boolean);
+    for (let i = 0; i < w.length; i++) for (let n = 1; n <= 4 && i + n <= w.length; n++) {
+      const span = w.slice(i, i + n), lo = span.map(x => x.toLowerCase());
+      const first = lo[0], last = lo[n - 1];
+      if (STOP.has(last)) continue;
+      if (STOP.has(first) && !['the', 'no', 'our', 'my', 'all', 'your', 'their', 'his', 'her'].includes(first)) continue;
+      const content = [...new Set(lo.filter(x => !STOP.has(x)))]; const inner = lo.slice(1, -1).filter(x => STOP.has(x) && x !== 'of').length;
+      if (!content.length || (n === 1 && content[0].length < 6)) continue;
+      let sc = content.reduce((a, x) => a + Math.min(x.length, 9), 0) + content.filter(x => x.length >= 7).length * 1.5;
+      if (i + n === w.length) sc += 2; if (first === 'the' || first === 'no') sc += 1; if (n === 4) sc -= 2; if (n === 1) sc -= 3; sc -= inner * 1.5;
+      sc += R() * 1.5;
+      if (!best || sc > best.sc) best = { sc, words: span };
+    }
+  });
+  if (!best) return null;
+  return best.words.map((x, k) => { const l = x.toLowerCase(); return k && TITLE_SMALL.has(l) ? l : l.charAt(0).toUpperCase() + l.slice(1); }).join(' ');
+}
+
+// ===================== TAPE CLEANUP =====================
+// Every sample goes through this once, so previews, the track, scratches and pads all use the clean version:
+// 1) steep high-pass (24 dB/oct at 110 Hz) for rumble, handling noise and mains hum, plus narrow notches at 60, 120 and 180 Hz
+// 2) low-pass at 7.5 kHz to take the edge off tape hiss
+// 3) a gentle downward expander that pulls the hiss down between words
+// 4) loudness normalization on the speech itself (not the silences), with a soft peak limit
+function biquad(d, type, f, sr, q = .7071) {
+  const w = 2 * Math.PI * f / sr, cs = Math.cos(w), al = Math.sin(w) / (2 * q); let b0, b1, b2, a0, a1, a2;
+  if (type === 'hp') { b0 = (1 + cs) / 2; b1 = -(1 + cs); b2 = b0; } else if (type === 'lp') { b0 = (1 - cs) / 2; b1 = 1 - cs; b2 = b0; } else { b0 = 1; b1 = -2 * cs; b2 = 1; }
+  a0 = 1 + al; a1 = -2 * cs; a2 = 1 - al;
+  let x1 = 0, x2 = 0, y1 = 0, y2 = 0;
+  for (let i = 0; i < d.length; i++) { const x = d[i], y = (b0 * x + b1 * x1 + b2 * x2 - a1 * y1 - a2 * y2) / a0; x2 = x1; x1 = x; y2 = y1; y1 = y; d[i] = y; }
+}
+function cleanSample(buf) {
+  const sr = buf.sampleRate, d = new Float32Array(buf.getChannelData(0));
+  biquad(d, 'hp', 110, sr, .54); biquad(d, 'hp', 110, sr, 1.31); // 4th-order Butterworth
+  biquad(d, 'notch', 60, sr, 6); biquad(d, 'notch', 120, sr, 8); biquad(d, 'notch', 180, sr, 8);
+  biquad(d, 'lp', 7500, sr);
+  // noise floor and speech level from 10 ms frames
+  const hop = Math.floor(sr * .01), fr = []; for (let i = 0; i + hop <= d.length; i += hop) { let s = 0; for (let k = 0; k < hop; k++) s += d[i + k] * d[i + k]; fr.push(Math.sqrt(s / hop)); }
+  const so = fr.slice().sort((a, b) => a - b), floor = so[Math.floor(so.length * .1)] || 1e-5, speech = so[Math.floor(so.length * .8)] || 1e-3;
+  // expander: frames near the noise floor drop up to ~16 dB; smoothed so words aren't chopped
+  if (speech > floor * 3) {
+    let g = 1; const att = 1 - Math.exp(-1 / (sr * .004)), rel = 1 - Math.exp(-1 / (sr * .08));
+    for (let i = 0; i < d.length; i++) {
+      const f = fr[Math.min(fr.length - 1, Math.floor(i / hop))], target = Math.max(.16, Math.min(1, (f - floor * 1.4) / (floor * 2.5)));
+      g += (target > g ? att : rel) * (target - g); d[i] *= g;
+    }
+  }
+  // normalize: louder speech frames to a common level, then soft-limit peaks to about -1 dBFS
+  const voiced = fr.filter(v => v > floor * 2.5); const lvl = voiced.length ? Math.sqrt(voiced.reduce((a, v) => a + v * v, 0) / voiced.length) : speech;
+  const gain = Math.min(30, .16 / (lvl || 1e-4));
+  for (let i = 0; i < d.length; i++) d[i] = Math.tanh(d[i] * gain * 1.1) * .89;
+  const fade = Math.min(400, d.length >> 3); for (let i = 0; i < fade; i++) { d[i] *= i / fade; d[d.length - 1 - i] *= i / fade; }
+  const out = new AudioBuffer({ length: d.length, sampleRate: sr, numberOfChannels: 1 }); out.copyToChannel(d, 0); return out;
+}
+
+// ===================== THE TAPES: six transcribed Nixon samples =====================
+const COMMONS_API = 'https://commons.wikimedia.org/w/api.php';
+const TAPE_QUERIES = ['White House Tapes conversation', 'Tape Conversation DPLA Nixon', 'Nixon telephone conversation', 'Nixon Oval Office meeting', 'Nixon tape'];
+const PD_RE = /(public domain|^pd\b|pd-|cc0|no known copyright)/i;
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const shuffle = (a, r = Math.random) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1));[a[i], a[j]] = [a[j], a[i]]; } return a; };
+const stripHTML = s => (s || '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#0?39;/g, "'").replace(/\s+/g, ' ').trim();
+function timeout(ms) { const c = new AbortController(); setTimeout(() => c.abort(), ms); return c.signal; }
+
+// "On June 23, 1972, President…" → "June 23, 1972"; also handles "23 June 1972" and "1972-06-23"
+function tapeDate(desc, dto, title) {
+  for (const s of [desc, title, dto]) {
+    const t = stripHTML(s);
+    let m = t.match(/\b(January|February|March|April|May|June|July|August|September|October|November|December) (\d{1,2}), (19[67]\d)\b/); if (m) return `${m[1]} ${+m[2]}, ${m[3]}`;
+    m = t.match(/\b(\d{1,2}) (January|February|March|April|May|June|July|August|September|October|November|December) (19[67]\d)\b/); if (m) return `${m[2]} ${+m[1]}, ${m[3]}`;
+    m = t.match(/\b(19[67]\d)-(\d\d)-(\d\d)\b/); if (m) return `${MONTHS[+m[2] - 1]} ${+m[3]}, ${m[1]}`;
+  }
+  return '';
+}
+
+async function findTapes() {
+  const results = await Promise.all(shuffle(TAPE_QUERIES).slice(0, 3).map(async q => {
+    const p = new URLSearchParams({ action: 'query', format: 'json', origin: '*', generator: 'search', gsrnamespace: '6', gsrlimit: '50', gsroffset: String(Math.random() < .5 ? 0 : 50), gsrsearch: `filetype:audio ${q}`, prop: 'imageinfo', iiprop: 'url|size|mime|extmetadata', iiextmetadatafilter: 'LicenseShortName|DateTimeOriginal|ImageDescription' });
+    try { const j = await (await fetch(`${COMMONS_API}?${p}`, { signal: timeout(15000) })).json(); return Object.values(j.query?.pages || {}); } catch { return []; }
+  }));
+  const seen = new Set(), tapes = [];
+  for (const pg of results.flat()) {
+    const ii = pg.imageinfo?.[0]; if (!ii || seen.has(pg.pageid)) continue; seen.add(pg.pageid);
+    const m = ii.extmetadata || {}; const desc = stripHTML(m.ImageDescription?.value);
+    if (!PD_RE.test(m.LicenseShortName?.value || '')) continue;
+    if (ii.size < 350e3 || ii.size > 9e6) continue;
+    if (!/nixon/i.test(desc + pg.title) || /reagan/i.test(desc + pg.title)) continue; // skip the Reagan call (contains a racist remark)
+    const withNixon = /President Richard M\. Nixon|Nixon (and|met|talked)|with Nixon|Nixon Oval/i.test(desc + pg.title);
+    tapes.push({ id: pg.pageid, title: pg.title.replace(/^File:/, '').replace(/\.[a-z0-9]+$/i, '').replace(/\s+-\s+DPLA\s+-\s+[0-9a-f]+$/i, ''), url: ii.url, page: ii.descriptionurl, date: tapeDate(desc, m.DateTimeOriginal?.value, pg.title), desc, withNixon, sizeMB: ii.size / 1e6 });
+  }
+  // famous standalone Nixon tapes join the pool (the big Smoking Gun file only some of the time)
+  try { const extra = EXTRA_TAPES.filter(x => !x.chance || Math.random() < x.chance); const info = await fileInfo(extra.map(x => x.file));
+    extra.forEach((x, i) => { const f = info[i]; if (f && !seen.has(f.url)) tapes.push({ id: f.url, title: x.file.replace(/\.[a-z0-9]+$/i, ''), url: f.url, page: f.page, date: x.date, desc: f.desc, withNixon: true, sizeMB: f.size / 1e6, big: x.big }); }); } catch { }
+  // conversations with Nixon himself first, then the rest; vary each visit
+  return [...shuffle(tapes.filter(t => t.withNixon)), ...shuffle(tapes.filter(t => !t.withNixon))];
+}
+
+const HALLUCINATION = /^(thank you|thanks for watching|you|bye|okay|oh|so|the end|subtitles.*|\W*)\.?$/i;
+function cleanLine(t) { return t.replace(/\[[^\]]*\]|\([^)]*\)|♪/g, ' ').replace(/\s+/g, ' ').trim().replace(/^[^A-Za-z0-9]+/, ''); }
+function displayLine(t) { return t.replace(/[.,;:!?…-]+$/, ''); } // printed as said, expletives and all
+
+let decodeCtx = null;
+async function decodeUrl(url) {
+  decodeCtx = decodeCtx || new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 44100 });
+  const r = await fetch(url, { signal: timeout(60000) }); if (!r.ok) throw new Error('HTTP ' + r.status);
+  return decodeCtx.decodeAudioData(await r.arrayBuffer());
+}
+
+// Gather six samples. onSample(sample, index) fires as each one is found; onStatus(text) reports progress.
+async function gatherSamples(onSample, onStatus, want = 6) {
+  const samples = []; const usedText = new Set();
+  // two lines from Nixon's public speeches (the famous ones more often), then the rest from the tapes
+  const weights = { 'Richard Nixon - "I\'m not a crook.".oga': .6, 'Nixon resignation audio with buzz removed.ogg': 1, 'Richard Nixon speaks on Peace in Vietnam.ogg': .7, 'Checkersspeechaudio.ogg': 1, 'Richard Nixon speaking in a 1960 campaign advertisement on defence.ogg': .4 };
+  const pool = SPEECHES.slice(); const chosen = [];
+  while (chosen.length < 2 && pool.length) { const w = pool.map(sp => weights[sp.file] || .4); let r = Math.random() * w.reduce((a, b) => a + b, 0), i = 0; while (r > w[i]) r -= w[i++]; chosen.push(pool.splice(Math.min(i, pool.length - 1), 1)[0]); }
+  for (const sp of chosen) {
+    try { const s = await speechLine(sp, onStatus, usedText); if (s) { samples.push(s); onSample(s, samples.length - 1); } }
+    catch (e) { if (/speech model/i.test(e.message || '')) throw e; }
+  }
+  onStatus('Searching the White House tapes…');
+  const tapes = await findTapes();
+  if (!tapes.length) throw new Error("Couldn't reach the tapes on Wikimedia Commons. Check your connection and try New tapes.");
+  for (const tape of tapes) {
+    if (samples.length >= want) break;
+    onStatus(`Threading ${tape.title.slice(0, 40)}…`);
+    if (tape.big) onStatus(`Threading the ${tape.title.slice(0, 50)} reel (a big one)…`);
+    let buf; try { buf = await decodeUrl(tape.url); } catch { continue; }
+    const a = segment(buf, 0);
+    // candidate lines: join neighbouring phrases (gaps under 0.4 s) into 1.4–4.8 s utterances, loudest first
+    const ph = a.phrases.slice().sort((x, y) => x.start - y.start), utt = [];
+    for (const p of ph) { const last = utt[utt.length - 1]; if (last && p.start - last.end < .4 * a.sr && p.end - last.start < 4.8 * a.sr) { last.end = p.end; last.level = Math.max(last.level, p.level); last.f0 = last.f0 || p.f0; } else utt.push({ ...p }); }
+    const cands = utt.filter(p => { const d = (p.end - p.start) / a.sr; return d >= 1.4 && d <= 4.8; })
+      .sort((x, y) => (y.level * 10 + (y.f0 ? .5 : 0)) - (x.level * 10 + (x.f0 ? .5 : 0))).slice(0, 5);
+    let tries = 0;
+    let fromThisTape = 0;
+    for (const c of shuffle(cands.slice(0, 3)).concat(cands.slice(3))) {
+      if (samples.length >= want || fromThisTape >= 2 || tries++ >= 4) break;
+      onStatus(`Transcribing a line from ${tape.date || 'the tapes'}…`);
+      let text = '';
+      try { text = cleanLine(await transcribe(a.mono, a.sr, c.start, c.end, (f, total) => onStatus(`Downloading the speech model, one time only (${Math.round(f * 100)}% of ${Math.round(total / 1e6)} MB)…`))); }
+      catch (e) { throw new Error("The speech model couldn't load, so the tapes can't be transcribed. Check your connection and try New tapes."); }
+      const words = text.split(/\s+/).filter(w => /[a-z]/i.test(w));
+      if (words.length < 3 || words.length > 16 || HALLUCINATION.test(text) || usedText.has(text.toLowerCase())) continue;
+      usedText.add(text.toLowerCase()); fromThisTape++;
+      const s = { text, show: displayLine(text), date: tape.date, tape, buf: cleanSample(sliceBuffer(a.mono, a.sr, c.start, c.end)), raw: sliceBuffer(a.mono, a.sr, c.start, c.end), words: words.length };
+      samples.push(s); onSample(s, samples.length - 1);
+    }
+  }
+  if (samples.length < 3) throw new Error('Not enough clear lines turned up on these tapes. Try New tapes.');
+  return samples;
+}
+
+// Pre-transcribed lines from the public-domain Nixon speeches on Wikimedia Commons.
+// [start s, approximate end s, text, famous, max end extension s] — ends are snapped to the real end of the voice at load time (refineEnd).
+const SPEECH_LINES = (() => {
+  const L = {
+    'Richard Nixon - "I\'m not a crook.".oga': [
+      [0, 1.88, 'And I want to say this to the television audience.'], [1.88, 3.72, 'I made my mistakes.'],
+      [11.2, 13.08, "I've earned every cent.", 1], [13.08, 18.56, 'And in all of my years of public life, I have never obstructed justice.', 1],
+      [25.88, 29.16, "People have got to know whether or not their President's a crook.", 1], [29.16, 30.92, "Well, I'm not a crook.", 1],
+      [30.92, 32.96, "I've earned everything I've got.", 1],
+    ],
+    'Richard Nixon speaks on Peace in Vietnam.ogg': [
+      [0, 7.68, 'Now let me begin by describing the situation I found when I was inaugurated on January 20.'],
+      [7.68, 10.24, 'The war had been going on for four years.'], [10.24, 13.76, '31,000 Americans had been killed in action.'],
+      [13.76, 18.56, 'The training program for the South Vietnamese was behind schedule.'],
+      [18.56, 26, '540,000 Americans were in Vietnam with no plans to reduce the number.'],
+      [53.02, 58.86, 'From a political standpoint, this would have been a popular and easy course to follow.'],
+      [76.8, 83.16, "Allowing Johnson's war to become Nixon's war, but I had a greater obligation", 1],
+      [94.32, 99.78, 'Peace and freedom in America and in the world.'],
+    ],
+    'Richard Nixon speaking in a 1960 campaign advertisement on defence.ogg': [
+      [28.3, 30.74, 'We both know Mr. Khrushchev.', 1], [30.74, 34, 'We have sat opposite the conference table with him.'],
+      [34, 36.36, 'We know what peace demands.', 1],
+      [36.36, 43.78, 'We will keep America the strongest nation in the world, and we will couple that strength with firm diplomacy.'],
+      [43.78, 50.5, 'No apologies, no regrets, always willing to negotiate for peace', 1],
+    ],
+    'Nixon resignation audio with buzz removed.ogg': [
+      [0, 6, 'Good evening. This is the 37th time I have spoken to you from this office', 0, .6],
+      [34.44, 40.5, 'Throughout the long and difficult period of Watergate, I have felt it was my duty to persevere', 0, .6],
+      [116.48, 122.36, 'But the interests of the nation must always come before any personal considerations.'],
+      [146.78, 148.6, 'I have never been a quitter.', 1, .6], [153.74, 158.22, 'Every instinct in my body.'],
+      [158.22, 162.5, 'But as President, I must put the interests of America first.', 1, .6],
+      [196.44, 202.28, 'Peace abroad and prosperity without inflation at home.'],
+      [202.28, 209.12, 'Therefore, I shall resign the presidency effective at noon tomorrow.', 1],
+      [209.12, 217, 'Vice President Ford will be sworn in as President at that hour in this office.'],
+      [246.38, 253.4, 'The leadership of America will be in good hands.'],
+      [287.2, 294, 'As we look to the future, the first essential is to begin healing the wounds of this nation'],
+      [426.68, 431, 'These years have been a momentous time in the history of our nation and the world.'],
+      [454.96, 457.5, "We have ended America's longest war.", 1, .6], [507.32, 514.84, 'Not our enemies, but our friends.'],
+      [578.2, 582.12, 'We have opened a new relation with the Soviet Union.'],
+      [677, 683, 'I have shared in the turbulent history of this era.'], [683, 687.04, 'I have fought for what I believe in.', 1],
+      [697.66, 701.5, 'Sometimes I have succeeded, and sometimes I have failed.', 1, .6],
+      [866.68, 873.68, 'This more than anything is what I hoped to achieve when I sought the presidency.'],
+    ],
+    'Checkersspeechaudio.ogg': [
+      [227.08, 229.64, 'Why did you have to have it?'], [229.64, 234.56, 'Let me tell you in just a word how a Senate office operates.'],
+      [234.56, 239.56, 'First of all, the Senator gets $15,000 a year in salary.'], [368.72, 371.06, 'The first way is to be a rich man.', 1],
+      [371.06, 375.26, "I don't happen to be a rich man, so I couldn't use that way.", 1],
+      [375.26, 380.38, 'Another way that is used is to put your wife on the payroll.'],
+      [665, 672, "Now, that, my friends, is not Nixon speaking, but that's an independent audit"],
+      [680, 683, 'And that is exactly what they did.'], [770, 776.28, 'I worked my way through college and to a great extent through law school.'],
+      [776.28, 785.88, "And then in 1940, probably the best thing that ever happened to me happened. I married Pat, who's sitting over here."],
+      [791.96, 793.96, 'I practiced law.'], [923.5, 925.6, 'The rent was $80 a month.'],
+      [932.48, 934.6, 'What did we do with this money?'], [934.6, 937.64, 'What do we have today to show for it?'],
+      [937.64, 941.02, 'This will surprise you because it is so little.'], [976, 979, 'I have no life insurance whatever on Pat.'],
+      [983, 988, 'I own a 1950 Oldsmobile car. We have our furniture.'],
+      [1083.2, 1087.66, 'Our two youngsters would like to have a dog.', 1], [1100.68, 1102.24, 'You know what it was?', 1],
+      [1108.32, 1110.52, 'Black and white spotted.', 1], [1110.52, 1114.88, 'And our little girl Tricia, the six-year-old, named it Checkers.', 1],
+      [1114.88, 1118, 'And you know, the kids, like all kids, love the dog.', 1],
+      [1128, 1137, "It isn't easy to come before a nationwide audience and bare your life as I've done."],
+      [1261, 1262.72, "He's had his wife on the payroll."], [1286.2, 1291.72, 'And if they don\'t, it will be an admission that they have something to hide.'],
+      [1388.68, 1395, 'You see, I love my country. And I think my country is in danger.', 1],
+      [1405, 1407, "Why do I think it's in danger?"], [1407, 1408.6, 'And I say, look at the record.'],
+    ],
+  };
+  const out = {};
+  for (const [f, rows] of Object.entries(L)) out[f] = rows.map(([a, b, text, famous, cap]) => ({ id: f.slice(0, 8) + Math.round(a * 10), a, b, text, famous: !!famous, cap: cap || 1.8 }));
+  return out;
+})();
+
+// ===================== NIXON SPEECHES =====================
+// Public-domain Nixon speeches on Wikimedia Commons. Each is transcribed with timestamps inside a search window,
+// and a line matching `want` (the famous bit) is preferred. Windows are in seconds.
+const SPEECHES = [
+  { file: 'Richard Nixon - "I\'m not a crook.".oga', name: 'Q&A with the Associated Press Managing Editors', date: 'November 17, 1973', want: /not a crook|earned every/i, win: [0, 40] },
+  { file: 'Nixon resignation audio with buzz removed.ogg', name: 'Resignation address', date: 'August 8, 1974', want: /resign|noon tomorrow|never been a quitter/i, win: [194, 222] }, // one 28 s window: the resign line sits in the middle, away from chunk seams
+  { file: 'Richard Nixon speaks on Peace in Vietnam.ogg', name: 'Address on the war in Vietnam (the “silent majority” speech)', date: 'November 3, 1969', want: /nixon's war|end the war|silent majority|greater obligation/i, win: [0, 125] },
+  { file: 'Richard Nixon speaking in a 1960 campaign advertisement on defence.ogg', name: '1960 campaign ad on defense', date: '1960', want: null, win: [0, 70] },
+  { file: 'Checkersspeechaudio.ogg', name: '“Checkers” speech, as candidate for vice president', date: 'September 23, 1952', want: /checkers|cloth coat|dog|kids love/i, win: 'random', big: true },
+];
+// Extra Nixon tapes that live outside the main White House Tapes series
+const EXTRA_TAPES = [
+  { file: 'Nixon tape from 3 August 1972 discussing the "decent interval".mp3', date: 'August 3, 1972' },
+  { file: 'Nixon tape of 6 October 1972 (decent interval).mp3', date: 'October 6, 1972' },
+  { file: 'Nixon Oval Office meeting with H.R. Haldeman "Smoking Gun" Conversation June 23, 1972.wav', date: 'June 23, 1972', big: true, chance: .3 },
+];
+
+async function fileInfo(files) {
+  const p = new URLSearchParams({ action: 'query', format: 'json', origin: '*', titles: files.map(f => 'File:' + f).join('|'), prop: 'imageinfo', iiprop: 'url|size|extmetadata', iiextmetadatafilter: 'LicenseShortName|ImageDescription' });
+  const j = await (await fetch(`${COMMONS_API}?${p}`, { signal: timeout(15000) })).json();
+  const byTitle = {}; for (const pg of Object.values(j.query?.pages || {})) { const ii = pg.imageinfo?.[0]; if (ii && PD_RE.test(ii.extmetadata?.LicenseShortName?.value || '')) byTitle[pg.title.replace(/^File:/, '')] = { url: ii.url, page: ii.descriptionurl, size: ii.size, desc: stripHTML(ii.extmetadata?.ImageDescription?.value) }; }
+  // titles come back normalized (underscores, quotes); match loosely
+  const key = s => s.toLowerCase().replace(/[_\s]+/g, ' ');
+  return files.map(f => Object.entries(byTitle).find(([t]) => key(t) === key(f))?.[1] || null);
+}
+
+// decode at 16 kHz: what the speech model wants, and light on memory for long speeches
+let ctx16 = null;
+async function decode16(url) { ctx16 = ctx16 || new AudioContext({ sampleRate: 16000 }); const r = await fetch(url, { signal: timeout(120000) }); if (!r.ok) throw new Error('HTTP ' + r.status); return ctx16.decodeAudioData(await r.arrayBuffer()); }
+async function to44k(d16, s, e) { // cut [s,e) seconds from 16 kHz audio and bring it up to the engine's 44.1 kHz
+  const a = Math.max(0, Math.floor(s * 16000)), b = Math.min(d16.length, Math.ceil(e * 16000)); const src = new AudioBuffer({ length: b - a, sampleRate: 16000, numberOfChannels: 1 }); src.copyToChannel(d16.subarray(a, b), 0);
+  const off = new OfflineAudioContext(1, Math.ceil((b - a) / 16000 * SR), SR); const n = off.createBufferSource(); n.buffer = src; n.connect(off.destination); n.start(0); return off.startRendering();
+}
+function trimEdges(buf) { // whisper timestamps are approximate: trim leading/trailing room tone, keep a little air
+  const d = buf.getChannelData(0), sr = buf.sampleRate, hop = Math.floor(sr * .01), fr = [];
+  for (let i = 0; i + hop <= d.length; i += hop) { let s = 0; for (let k = 0; k < hop; k++) s += d[i + k] * d[i + k]; fr.push(Math.sqrt(s / hop)); }
+  const thr = Math.max(...fr) * .07; let a = fr.findIndex(v => v > thr), b = fr.length - 1 - [...fr].reverse().findIndex(v => v > thr);
+  if (a < 0) return buf; a = Math.max(0, a - 5); b = Math.min(fr.length, b + 22);
+  const out = new AudioBuffer({ length: (b - a) * hop, sampleRate: sr, numberOfChannels: 1 }); out.copyToChannel(d.subarray(a * hop, b * hop), 0); return out;
+}
+
+// ---- line bank: pre-transcribed lines with timestamps (see speechbank.js) ----
+function recentLines() { try { return new Set(JSON.parse(localStorage.getItem('tdmc-recent') || '[]')); } catch { return new Set(); } }
+function rememberLine(id) { try { const r = [...recentLines(), id].slice(-24); localStorage.setItem('tdmc-recent', JSON.stringify(r)); } catch { } }
+const decoded16 = new Map();
+async function decode16Cached(url) { if (!decoded16.has(url)) decoded16.set(url, decode16(url)); return decoded16.get(url); }
+// Snap the end of a line to where the voice really stops: keep going while speech resumes within 0.4 s
+// (Nixon pauses mid-sentence: "Therefore… I shall resign the presidency effective… at noon tomorrow.")
+function refineEnd(d, a, b, cap = 1.8) {
+  const hop = 160, E = t => { const i = Math.floor(t * 16000); let s = 0; for (let k = 0; k < hop; k++) { const v = d[i + k] || 0; s += v * v; } return Math.sqrt(s / hop); };
+  const fr = []; for (let t = a; t < b; t += .01) fr.push(E(t)); fr.sort((x, y) => x - y);
+  const thr = (fr[Math.floor(fr.length * .8)] || 1e-4) * .12;
+  let end = b, quiet = 0; for (let t = b - .3; t < b + cap; t += .01) { if (E(t) > thr) { end = Math.max(end, t + .01); quiet = 0; } else if ((quiet += .01) >= .4 && t > b) break; }
+  return end;
+}
+async function bankLine(sp, onStatus, usedText) {
+  const recent = recentLines(); let pool = sp.lines.filter(l => !recent.has(l.id) && !usedText.has(l.text.toLowerCase()));
+  if (!pool.length) pool = sp.lines.filter(l => !usedText.has(l.text.toLowerCase())); if (!pool.length) return null;
+  const fam = pool.filter(l => l.famous); const line = fam.length && Math.random() < .3 ? fam[Math.floor(Math.random() * fam.length)] : pool[Math.floor(Math.random() * pool.length)];
+  const [info] = await fileInfo([sp.file]); if (!info) return null;
+  onStatus(`Rolling the tape on the ${sp.name.replace(/\s*\(.*\)$/, '')}…`);
+  const buf = await decode16Cached(info.url); const d = buf.getChannelData(0);
+  if (line.a > buf.duration - .5) return null;
+  const end = Math.min(buf.duration, refineEnd(d, line.a, line.b, line.cap));
+  const raw = trimEdges(await to44k(d, line.a - .25, end + .3));
+  rememberLine(line.id); usedText.add(line.text.toLowerCase());
+  return { text: line.text, show: displayLine(line.text), date: sp.date, iconic: !!line.famous, speech: true,
+    tape: { title: sp.name, page: info.page, desc: '', date: sp.date }, buf: cleanSample(raw), raw, words: line.text.split(/\s+/).length };
+}
+
+// one line from one speech: from the bank when we have it, otherwise transcribe a window live
+async function speechLine(sp, onStatus, usedText) {
+  if (sp.lines?.length) return bankLine(sp, onStatus, usedText);
+  const [info] = await fileInfo([sp.file]); if (!info) return null;
+  onStatus(`Rolling the tape on the ${sp.name.replace(/\s*\(.*\)$/, '')}…`);
+  const buf = await decode16(info.url); const d = buf.getChannelData(0);
+  let [w0, w1] = sp.win === 'random' ? (() => { const s = Math.random() * Math.max(0, buf.duration - 50); return [s, s + 50]; })() : sp.win;
+  w1 = Math.min(w1, buf.duration);
+  onStatus(`Transcribing the ${sp.name.replace(/\s*\(.*\)$/, '')} (${Math.round(w1 - w0)} s of it)…`);
+  const asr = await loadASR((f, total) => onStatus(`Downloading the speech model, one time only (${Math.round(f * 100)}% of ${Math.round(total / 1e6)} MB)…`));
+  const r = await asr(d.subarray(Math.floor(w0 * 16000), Math.floor(w1 * 16000)), { return_timestamps: true, chunk_length_s: 30, stride_length_s: 5 });
+  const raw0 = (r.chunks || []).map(c => ({ text: cleanLine(c.text), a: w0 + (c.timestamp[0] ?? 0), b: w0 + (c.timestamp[1] ?? (c.timestamp[0] + 4)) }));
+  // whisper sometimes splits a sentence across segments ("…effective" / "at noon tomorrow."): rejoin until the sentence ends
+  const merged = []; for (const c of raw0) { const last = merged[merged.length - 1]; if (last && !/[.!?]["'”]?$/.test(last.text) && c.b - last.a <= 9) { last.text = (last.text + ' ' + c.text).replace(/\s+/g, ' '); last.b = c.b; } else merged.push({ ...c }); }
+  const segs = merged.filter(c => { const n = c.text.split(/\s+/).filter(w => /[a-z]/i.test(w)).length, dur = c.b - c.a; return n >= 3 && n <= 18 && dur >= .8 && dur <= 9 && !HALLUCINATION.test(c.text) && !usedText.has(c.text.toLowerCase()); });
+  if (!segs.length) return null;
+  const famous = sp.want ? segs.filter(c => sp.want.test(c.text)) : [];
+  const c = famous.length ? famous[Math.floor(Math.random() * famous.length)] : segs[Math.floor(Math.random() * segs.length)];
+  const raw = trimEdges(await to44k(d, c.a - .2, refineEnd(d, c.a, c.b) + .3)); // snap to where the voice really stops
+  usedText.add(c.text.toLowerCase());
+  const words = c.text.split(/\s+/).filter(w => /[a-z]/i.test(w)).length;
+  return { text: c.text, show: displayLine(c.text), date: sp.date, iconic: !!famous.length, speech: true,
+    tape: { title: sp.name, page: info.page, desc: '', date: sp.date }, buf: cleanSample(raw), raw, words };
+}
+SPEECHES.forEach(sp => { sp.lines = (typeof SPEECH_LINES !== 'undefined' && SPEECH_LINES[sp.file]) || []; });
+
+// ===================== SCRATCHING =====================
+// Simulates a hand moving the record back and forth (pitch follows speed) plus a crossfader cutting the sound.
+// Patterns are lists of strokes: { beats, from, to, fader(u) } where from/to are 0..1 of the scratch window.
+const SCRATCHES = {
+  baby: { name: 'Baby scratch', beats: 2, strokes: [0, 1, 2, 3].map(i => ({ beats: .5, from: i % 2 ? 1 : 0, to: i % 2 ? 0 : 1, fader: () => 1 })) },
+  chirp: { name: 'Chirp', beats: 2, strokes: Array.from({ length: 8 }, (_, i) => ({ beats: .25, from: i % 2 ? 1 : 0, to: i % 2 ? 0 : 1, fader: u => i % 2 ? 0 : (u < .7 ? 1 : 0) })) },
+  flare: { name: 'Flare', beats: 2, strokes: Array.from({ length: 4 }, (_, i) => ({ beats: .5, from: i % 2 ? 1 : 0, to: i % 2 ? 0 : 1, fader: u => (u > .3 && u < .38) || (u > .62 && u < .7) ? 0 : 1 })) },
+  scribble: { name: 'Scribble', beats: 1, win: .12, strokes: Array.from({ length: 24 }, (_, i) => ({ beats: 1 / 24, from: i % 2 ? .6 : 0, to: i % 2 ? 0 : .6, fader: () => 1 })) },
+  tear: { name: 'Tear', beats: 2, strokes: [0, 1].flatMap(() => [{ beats: .2, from: 0, to: .5, fader: () => 1 }, { beats: .05, from: .5, to: .5, fader: () => 1 }, { beats: .25, from: .5, to: 1, fader: () => 1 }, { beats: .2, from: 1, to: .5, fader: () => 1 }, { beats: .05, from: .5, to: .5, fader: () => 1 }, { beats: .25, from: .5, to: 0, fader: () => 1 }]) },
+  stretch: { name: 'Rose Mary stretch', beats: 2.5, strokes: [{ beats: 2, from: 0, to: 1, fader: u => (Math.floor(u * 16) % 2 === 0 ? 1 : 0) }, { beats: .5, from: 1, to: 0, fader: u => u < .5 ? 1 : 0 }] },
+};
+// Render a scratch from a sample (Float32Array at sr). window = seconds of record covered by a full stroke.
+function renderScratch(src, sr, pattern, beatSec, win = .32, startAt = 0) {
+  const p = SCRATCHES[pattern], total = Math.floor(p.beats * beatSec * sr), out = new Float32Array(total + 512);
+  const w = Math.min(p.win || win, src.length / sr - startAt - .01) * sr, s0 = startAt * sr;
+  let o = 0, prevPos = s0, lp = 0;
+  for (const st of p.strokes) {
+    const n = Math.floor(st.beats * beatSec * sr);
+    for (let i = 0; i < n && o < total; i++, o++) {
+      const u = i / n, e = (1 - Math.cos(Math.PI * u)) / 2; // hand motion eases in and out
+      const pos = s0 + w * (st.from + (st.to - st.from) * e), k = Math.floor(pos), fr = pos - k;
+      const speed = Math.abs(pos - prevPos); prevPos = pos;
+      let v = ((src[k] || 0) * (1 - fr) + (src[k + 1] || 0) * fr);
+      v += (Math.random() * 2 - 1) * .012 * Math.min(1, speed); // needle noise
+      const a = Math.min(.9, .15 + speed * .6); lp += a * (v - lp); // slow drags sound duller
+      const g = st.fader(u), edge = Math.min(1, i / 40, (n - i) / 40);
+      out[o] = lp * g * edge * 1.4;
+    }
+  }
+  // smooth crossfader clicks
+  for (let i = 1; i < out.length; i++) out[i] = out[i] * .7 + out[i - 1] * .3;
+  return out;
+}
+// First word-ish chunk of a sample: where the scratch "needle drop" goes
+function chunks(buf) {
+  const d = buf.getChannelData(0), sr = buf.sampleRate, hop = Math.floor(sr * .01), rms = [];
+  for (let i = 0; i + hop < d.length; i += hop) { let s = 0; for (let k = 0; k < hop; k++) s += d[i + k] * d[i + k]; rms.push(Math.sqrt(s / hop)); }
+  const thr = Math.max(...rms) * .22, out = []; let st = -1, last = -1;
+  for (let i = 0; i < rms.length; i++) { if (rms[i] > thr) { if (st < 0) st = i; last = i; } else if (st >= 0 && i - last > 3) { if (last - st >= 6) out.push([st * hop / sr, (last + 1) * hop / sr]); st = -1; } }
+  if (st >= 0 && last - st >= 6) out.push([st * hop / sr, (last + 1) * hop / sr]);
+  return out.length ? out : [[0, Math.min(.4, d.length / sr)]];
+}
+
+// ===================== SOUND EFFECTS =====================
+// All synthesized: no samples needed. Each returns a mono Float32Array at the engine rate.
+function fxSiren(beat) { // the classic rising-and-falling hip-hop siren, two bars of it
+  const n = Math.floor(beat * 8 * SR), o = new Float32Array(n); let ph = 0, ph2 = 0;
+  for (let i = 0; i < n; i++) { const x = i / SR, sweep = .5 - .5 * Math.cos(2 * Math.PI * x / (beat * 2)); const f = 650 + 750 * sweep;
+    ph += f / SR; ph2 += f * 1.005 / SR; const tri = v => 1 - 4 * Math.abs((v % 1) - .5); let v = (tri(ph) + tri(ph2)) * .5;
+    v = Math.tanh(v * 2.2) * .5 * Math.min(1, x / .05, (n - i) / (SR * .2)); o[i] = v; }
+  return echoMono(o, beat * .75, .35);
+}
+function fxAirhorn(beat) { // BWAAP — BWAP — BWAAAAP
+  const hits = [[0, .55], [.75, .2], [1, .9]], n = Math.floor(beat * 2.2 * SR), o = new Float32Array(n);
+  for (const [st, len] of hits) { const s0 = Math.floor(st * beat * SR), L = Math.floor(len * beat * SR); const ph = [0, 0, 0];
+    for (let i = 0; i < L && s0 + i < n; i++) { const x = i / SR, vib = 1 + .012 * Math.sin(2 * Math.PI * 7 * x) - .03 * Math.exp(-x * 30);
+      let v = 0; [466, 554, 698].forEach((f, k) => { ph[k] += f * vib / SR; v += 2 * (ph[k] % 1) - 1; }); o[s0 + i] += Math.tanh(v * 1.4) * .32 * Math.min(1, i / 200, (L - i) / 400); } }
+  let lp = 0; for (let i = 0; i < n; i++) { lp += .25 * (o[i] - lp); o[i] = lp; } // take the fizz off
+  return echoMono(o, beat * .5, .3);
+}
+function fxLaser(beat) { // three descending zaps on eighth notes
+  const n = Math.floor(beat * 2 * SR), o = new Float32Array(n);
+  for (let z = 0; z < 3; z++) { const s0 = Math.floor(z * beat / 2 * SR), L = Math.floor(.28 * SR); let ph = 0;
+    for (let i = 0; i < L && s0 + i < n; i++) { const x = i / SR; ph += (180 + 3200 * Math.exp(-x * 16)) / SR; o[s0 + i] += (ph % 1 < .5 ? 1 : -1) * .22 * Math.exp(-x * 7); } }
+  return echoMono(o, beat * .375, .45);
+}
+function echoMono(d, delaySec, fb) { const dl = Math.floor(delaySec * SR), out = new Float32Array(d.length + dl * 4); out.set(d); for (let i = dl; i < out.length; i++) out[i] += out[i - dl] * fb; return out; }
+// DJ rewind: spin the record backwards from the current position, speeding up, with the needle noise
+function fxRewind(trackBuf, pos) {
+  const L = Math.floor(1.1 * SR), chs = [trackBuf.getChannelData(0), trackBuf.getChannelData(1)], out = [new Float32Array(L), new Float32Array(L)];
+  let p = pos * SR, v = 0;
+  for (let i = 0; i < L; i++) { const u = i / L; v = -(.4 + 5 * u * u); p += v; if (p < 1) p = 1; const k = Math.floor(p), fr = p - k, env = Math.min(1, i / 300) * (1 - u ** 3);
+    for (let c = 0; c < 2; c++) out[c][i] = ((chs[c][k] || 0) * (1 - fr) + (chs[c][k + 1] || 0) * fr) * env + (Math.random() - .5) * .02 * env; }
+  return out;
+}
+
+// ===================== OLD-SCHOOL RAP COMPOSER =====================
+// Sliders (0..1): tempo (slow→fast), bass (808 boom→funk bass), vibe (paranoid→party), drums (drum machine→dusty breakbeat)
+const lerp = (a, b, t) => a + (b - a) * t;
+const smooth = (e0, e1, x) => { const t = Math.max(0, Math.min(1, (x - e0) / (e1 - e0))); return t * t * (3 - 2 * t); };
+const mhz = m => 440 * Math.pow(2, (m - 69) / 12);
+
+const SECTIONS = [['intro', 4], ['verse', 8], ['hook', 8], ['verse', 8], ['break', 4], ['hook', 8], ['outro', 4]];
+const PROGS = { // semitone offsets from the root per bar, with chord quality
+  dark: [[[0, 'm'], [0, 'm'], [1, 'M'], [0, 'm']], [[0, 'm'], [0, 'm'], [8, 'M'], [7, 'm']]],
+  mid: [[[0, 'm7'], [0, 'm7'], [5, 'm7'], [0, 'm7']], [[0, 'm7'], [10, 'M'], [5, 'm7'], [0, 'm7']]],
+  party: [[[0, '7'], [0, '7'], [5, '7'], [0, '7']], [[0, 'm7'], [5, '7'], [0, 'm7'], [5, '7']]],
+};
+const CHORD = { m: [0, 3, 7], M: [0, 4, 7], m7: [0, 3, 7, 10], '7': [0, 4, 7, 10] };
+
+async function composeRap(samples, hookIdx, o, onStatus) {
+  const R = rng(o.seed), pick = a => a[Math.floor(R() * a.length)], T = o.tempo, B = o.bass, V = o.vibe, D = o.drums;
+  const bpm = Math.round(lerp(84, 114, T)), beat = 60 / bpm, bar = beat * 4, s16 = beat / 4, T0 = .25;
+  const swing = lerp(0, .2, D), human = lerp(0, .008, D);
+  const nBars = SECTIONS.reduce((a, s) => a + s[1], 0), L = T0 + nBars * bar + 3, N = Math.ceil(L * SR);
+  const secAt = []; SECTIONS.forEach(([k, n]) => { for (let i = 0; i < n; i++) secAt.push({ k, i, n }); });
+  const rootMidi = 28 + Math.floor(R() * 6); // E1..A1
+  const progKind = V < .35 ? 'dark' : V < .65 ? 'mid' : 'party'; const prog = pick(PROGS[progKind]);
+  const chordAt = b => prog[b % 4];
+  const stepT = (b, st) => T0 + b * bar + st * s16 + (st % 2 ? s16 * swing : 0) + (R() - .5) * 2 * human;
+  const events = [];
+  const mk = () => [new Float32Array(N), new Float32Array(N)];
+  const drums = mk(), brk = mk(), bass = mk(), music = mk(), vox = mk(), echo = mk(), verb = mk();
+  const add = (bus, o, v, pan = 0) => { if (o >= 0 && o < N) { bus[0][o] += v * Math.min(1, 1 - pan); bus[1][o] += v * Math.min(1, 1 + pan); } };
+  const noise = () => Math.random() * 2 - 1, sat = (v, d) => Math.tanh(v * d) / Math.tanh(d);
+
+  // ---------- drum sounds: two kits, mixed by the drums slider ----------
+  const kickTimes = [];
+  const kick808 = (t, a) => { kickTimes.push(t); const o = Math.floor(t * SR); let ph = 0; const dec = lerp(.9, .55, D); for (let i = 0; i < SR * dec * 1.6; i++) { const x = i / SR; ph += 2 * Math.PI * (46 + 100 * Math.exp(-x * 34)) / SR; let v = Math.sin(ph) * Math.exp(-x / dec * 2.2); if (i < 130) v += noise() * .6 * (1 - i / 130); add(drums, o + i, sat(v * 1.3, 3) * a * 1.25); } };
+  const kickBrk = (t, a) => { kickTimes.push(t); const o = Math.floor(t * SR); let ph = 0; for (let i = 0; i < SR * .36; i++) { const x = i / SR; ph += 2 * Math.PI * (52 + 150 * Math.exp(-x * 48)) / SR; let v = Math.sin(ph) * Math.exp(-x * 9); if (i < 180) v += noise() * .8 * (1 - i / 180); add(brk, o + i, sat(v * 1.4, 3.6) * a * 1.3); } };
+  const snare808 = (t, a) => { const o = Math.floor(t * SR); let p1 = 0, p2 = 0, hp = 0, prev = 0; for (let i = 0; i < SR * .25; i++) { const x = i / SR; p1 += 2 * Math.PI * 180 / SR; p2 += 2 * Math.PI * 330 / SR; const n = noise(); hp = n - prev; prev = n; add(drums, o + i, sat(((Math.sin(p1) * .5 + Math.sin(p2) * .3) * Math.exp(-x * 25) + hp * .5 * Math.exp(-x * 14)) * 1.3, 2.2) * a * 1.2, -.05); } };
+  const clap = (t, a, bus = drums) => { const o = Math.floor(t * SR); let b1 = 0, b2 = 0; for (let i = 0; i < SR * .22; i++) { const x = i / SR; b1 += .35 * (noise() - b1); b2 += .35 * (b1 - b2); const burst = x < .03 ? (Math.floor(x / .009) % 2 ? .3 : 1) * Math.exp(-(x % .009) * 300) : Math.exp(-(x - .03) * 18); add(bus, o + i, (b1 - b2) * 3.2 * burst * a, .08); } };
+  const snareBrk = (t, a) => { const o = Math.floor(t * SR); let ph = 0, b1 = 0, b2 = 0; for (let i = 0; i < SR * .3; i++) { const x = i / SR; ph += 2 * Math.PI * (210 - 40 * x) / SR; b1 += .55 * (noise() - b1); b2 += .2 * (b1 - b2); add(brk, o + i, sat((Math.sin(ph) * .7 * Math.exp(-x * 30) + (b1 - b2) * 1.7 * Math.exp(-x * 13)) * a * 1.25, 2.8), -.08); } };
+  const hat = (t, a, open, bus, pan = .25) => { const o = Math.floor(t * SR), dur = open ? .28 : .045; let prev = 0, hp2 = 0; for (let i = 0; i < SR * dur; i++) { const n = noise(); const h = n - prev; prev = n; hp2 = h - hp2 * .3; add(bus, o + i, hp2 * .5 * Math.exp(-i / (SR * dur * .35)) * a, pan); } };
+  const cowbell = (t, a) => { const o = Math.floor(t * SR); let p1 = 0, p2 = 0; for (let i = 0; i < SR * .3; i++) { p1 += 540 / SR; p2 += 800 / SR; add(drums, o + i, ((p1 % 1 < .5 ? 1 : -1) + (p2 % 1 < .5 ? 1 : -1)) * .12 * Math.exp(-i / (SR * .07)) * a, .35); } };
+  const tamb = (t, a) => { const o = Math.floor(t * SR); let prev = 0; for (let i = 0; i < SR * .12; i++) { const n = noise(); const h = n - prev; prev = n; add(brk, o + i, h * .35 * Math.exp(-i / (SR * .03)) * (1 + .5 * Math.sin(i / 30)) * a, -.35); } };
+
+  // patterns (16 steps); A/B bars alternate, with fills at phrase ends
+  const PAT = {
+    m: { kick: [[0, 3, 6, 10], [0, 6, 10, 13]], snare: [4, 12], hat: [0, 2, 4, 6, 8, 10, 12, 14], bell: [2, 7, 10, 15] },
+    b: { kick: [[0, 7, 10], [0, 2, 10, 11]], snare: [4, 12], ghost: [7, 9, 14], hat: [0, 2, 4, 6, 8, 10, 12], open: [14] },
+  };
+  onStatus?.('Laying down the beat…');
+  for (let b = 0; b < nBars; b++) {
+    const s = secAt[b], ab = b % 2, fill = s.i === s.n - 1 && s.k !== 'outro';
+    const energy = { intro: .55, verse: .9, hook: 1, break: 1, outro: .6 }[s.k];
+    const introSparse = s.k === 'intro' && s.i < 2;
+    for (let st = 0; st < 16; st++) {
+      const t = stepT(b, st);
+      // drum machine (left of the drums slider)
+      if (D < .98) {
+        const a = (1 - D) * energy;
+        if (PAT.m.kick[ab].includes(st) && !introSparse) kick808(t, .9 * a);
+        if (PAT.m.snare.includes(st) && !introSparse) { snare808(t, .7 * a); if (V > .3) clap(t, .5 * a * smooth(.3, .9, V)); }
+        if (PAT.m.hat.includes(st) || (V > .6 && R() < (V - .6))) hat(t, .45 * a * (st % 4 ? .7 : 1), false, drums);
+        if (V > .55 && PAT.m.bell.includes(st) && R() < smooth(.55, 1, V)) cowbell(t, .7 * a);
+        if (fill && st >= 12 && R() < .7) snare808(t, .45 * a);
+      }
+      // breakbeat (right of the drums slider)
+      if (D > .02) {
+        const a = D * energy;
+        if (PAT.b.kick[ab].includes(st) && !introSparse) kickBrk(t, .95 * a);
+        if (PAT.b.snare.includes(st) && !introSparse) { snareBrk(t, .85 * a); if (V > .5) clap(t, .35 * a * smooth(.5, 1, V), brk); }
+        if (PAT.b.ghost.includes(st) && R() < .7) snareBrk(t, .18 * a);
+        if (PAT.b.hat.includes(st)) hat(t, .5 * a * (st % 4 ? .65 : 1), false, brk, -.2);
+        if (PAT.b.open.includes(st)) hat(t, .35 * a, true, brk, -.2);
+        if (V > .5 && st % 2 === 1 && R() < smooth(.5, 1, V)) tamb(t, .6 * a);
+        if (fill && st >= 12) snareBrk(t, (.3 + .4 * (st - 12) / 4) * a);
+      }
+    }
+    if (!introSparse) events.push({ t: T0 + b * bar, d: bar * .95, layer: 'beat' });
+  }
+
+  // ---------- bassline ----------
+  onStatus?.('Writing the bassline…');
+  const boom = (t, dur, m, a) => { const o = Math.floor(t * SR), f = mhz(m); let ph = 0; for (let i = 0; i < SR * (dur + .3); i++) { const x = i / SR; ph += 2 * Math.PI * f * (1 + .12 * Math.exp(-x * 40)) / SR; const env = Math.exp(-x / Math.max(.4, dur) * 1.4) * Math.min(1, i / 80) * (x > dur ? Math.max(0, 1 - (x - dur) / .3) : 1); add(bass, o + i, sat(Math.sin(ph) * env, 2.2) * a); } };
+  const pluck = (t, dur, m, a, slideFrom) => { const o = Math.floor(t * SR), f = mhz(m); let ph = 0, low = 0, band = 0; const f0 = slideFrom ? mhz(slideFrom) : f;
+    for (let i = 0; i < SR * (dur + .05); i++) { const x = i / SR; const fr = f0 + (f - f0) * Math.min(1, x / .05); ph += fr / SR; const saw = 2 * (ph % 1) - 1, sub = Math.sin(2 * Math.PI * ph);
+      const cut = 180 + 1800 * Math.exp(-x * 18) * (.6 + V * .6), ff = 2 * Math.sin(Math.PI * Math.min(cut, 6000) / SR); low += ff * band; const hi = saw - low - .5 * band; band += ff * hi;
+      const env = Math.min(1, i / 40) * Math.exp(-x * 4) * (x > dur ? Math.max(0, 1 - (x - dur) / .05) : 1); add(bass, o + i, sat((low * .7 + sub * .5) * env, 1.8) * a); } };
+  // 808 pattern: long notes on the 1, the "and" of 2, beat 3-and-a-bit; funk pattern: busy 16ths with octave pops and ghosts
+  const boomPat = [[0, 6], [10, 4]], boomPat2 = [[0, 3], [3, 4], [10, 6]];
+  const funkGen = () => { const p = []; for (let st = 0; st < 16; st++) { if (st === 0) p.push([0, 0, 2]); else if (R() < (st % 4 === 0 ? .45 : st % 2 ? .38 : .3)) p.push([st, pick([0, 0, 12, 7, 10, 3, 5]), R() < .3 ? 1 : 2]); } return p; };
+  let funkA = funkGen(), funkB = funkGen();
+  for (let b = 0; b < nBars; b++) {
+    const s = secAt[b]; if (s.k === 'intro' && s.i < 2) continue; if (s.k === 'break' && s.i < 2) continue;
+    if (b % 8 === 0 && b && R() < .4) { funkA = funkGen(); funkB = funkGen(); }
+    const [deg] = chordAt(b), root = rootMidi + deg, a = s.k === 'outro' ? .7 : 1;
+    // 808 boom (left of bass slider)
+    if (B < .97) for (const [st, len] of (b % 2 ? boomPat2 : boomPat)) boom(stepT(b, st), len * s16 * 1.1, root + (st === 10 && R() < .3 ? 7 : 0), .85 * (1 - B) * a);
+    // funk bass (right)
+    if (B > .03) { let prev = null; for (const [st, semi, len] of (b % 2 ? funkB : funkA)) { if (R() > smooth(0, .7, B) + .1) continue; const m = root + 12 + semi; pluck(stepT(b, st), len * s16 * .9, m, .55 * B * a * (st % 4 === 0 ? 1 : .8), prev && R() < .2 ? prev : null); prev = m; } }
+    events.push({ t: T0 + b * bar, d: bar * .95, layer: 'bass' });
+  }
+
+  // ---------- stabs, keys and pads (vibe) ----------
+  onStatus?.('Adding stabs…');
+  const chordNotes = (b, octave) => { const [deg, q] = chordAt(b); return CHORD[q].map(i => rootMidi + deg + octave + i); };
+  const pad = (t, dur, ms, a) => { const o = Math.floor(t * SR); const phs = ms.flatMap(m => [0, 0]); let lp = 0; for (let i = 0; i < SR * dur; i++) { const x = i / SR; let v = 0; ms.forEach((m, k) => { for (let d = 0; d < 2; d++) { const j = k * 2 + d; phs[j] += mhz(m) * (1 + (d ? .004 : -.004)) / SR; v += 2 * (phs[j] % 1) - 1; } }); lp += .02 * (v - lp); const env = Math.min(1, x / 1.2) * Math.min(1, (dur - x) / .8); add(music, o + i, lp * .08 * env * a, Math.sin(x)); } };
+  const stab = (t, ms, a, kind, pan = 0) => { const o = Math.floor(t * SR), dur = kind === 'keys' ? .7 : kind === 'orch' ? .45 : .28; const phs = ms.map(() => 0); let lp = 0, mph = 0;
+    for (let i = 0; i < SR * dur; i++) { const x = i / SR; let v = 0;
+      if (kind === 'keys') { ms.forEach((m, k) => { phs[k] += mhz(m) / SR; v += Math.sin(2 * Math.PI * phs[k] + 1.5 * Math.exp(-x * 8) * Math.sin(2 * Math.PI * phs[k] * 2)); }); v *= .25 * Math.exp(-x * 4); }
+      else { ms.forEach((m, k) => { phs[k] += mhz(m) * (kind === 'orch' ? 1 - .02 * x : 1) / SR; v += 2 * (phs[k] % 1) - 1; }); const cut = kind === 'orch' ? .5 : .08 + .4 * Math.exp(-x * 20); lp += cut * (v - lp); v = lp * .22 * Math.exp(-x * (kind === 'orch' ? 7 : 10)); if (kind === 'orch' && x < .05) v += noise() * .5 * (1 - x / .05); }
+      add(music, o + i, v * a * Math.min(1, i / 30), pan); } };
+  for (let b = 0; b < nBars; b++) {
+    const s = secAt[b]; if (s.k === 'intro' && s.i < 2) continue;
+    const padA = Math.pow(1 - V, 1.5), keysA = Math.max(0, 1 - Math.abs(V - .5) * 2.2), orchA = smooth(.55, 1, V), brassA = smooth(.4, 1, V);
+    if (padA > .05 && b % 2 === 0) pad(T0 + b * bar, bar * 2, chordNotes(b, 24).concat(V < .2 ? [rootMidi + 24 + 1] : []), padA * (s.k === 'break' ? 1.3 : 1));
+    if (keysA > .05) for (const st of [2, 6, 10, 14]) if (R() < .75) stab(stepT(b, st), chordNotes(b, 36), keysA * .9, 'keys', .3);
+    if (orchA > .05 && (s.i % 4 === 0 || (s.k === 'hook' && b % 2 === 0))) { stab(T0 + b * bar, chordNotes(b, 36), orchA * .9, 'orch'); events.push({ t: T0 + b * bar, d: .4, layer: 'stabs' }); }
+    if (orchA > .3 && s.i % 4 === 3) stab(stepT(b, 14), chordNotes(b + 1, 36), orchA * .7, 'orch');
+    if (brassA > .05 && s.k !== 'break') for (const st of (b % 2 ? [6, 7] : [3, 10])) if (R() < .8) stab(stepT(b, st), chordNotes(b, 48), brassA * .55, 'brass', -.25);
+    if (padA > .05 || keysA > .05) events.push({ t: T0 + b * bar, d: bar * .95, layer: 'stabs' });
+  }
+
+  // ---------- vocals: the samples, front and center ----------
+  onStatus?.('Cutting the tapes…');
+  const prep = samples.map(sm => { // samples arrive cleaned and normalized (cleanup.js); add a touch of grit
+    const d = sm.buf.getChannelData(0); const out = new Float32Array(d.length); for (let i = 0; i < d.length; i++) out[i] = sat(d[i] * 1.25, 1.5) * .8;
+    return { d: out, ch: chunks(sm.buf), dur: d.length / SR };
+  });
+  const sayAt = (k, t, { from = 0, to = null, gain = 1, pan = 0, echoTail = false, layer = 'lines' } = {}) => {
+    const p = prep[k], s0 = Math.floor(from * SR), s1 = Math.min(p.d.length, to == null ? p.d.length : Math.floor(to * SR)), o = Math.floor(t * SR), n = s1 - s0;
+    for (let i = 0; i < n; i++) { const fade = Math.min(1, i / 60, (n - i) / 120); add(vox, o + i, p.d[s0 + i] * gain * fade, pan); add(verb, o + i, p.d[s0 + i] * gain * fade * .08); }
+    if (echoTail) { const tail = Math.floor(Math.min(.5, n / SR * .4) * SR); for (let i = n - tail; i < n; i++) add(echo, o + i, p.d[s0 + i] * gain * .9, 0); }
+    events.push({ t, d: n / SR, layer, k });
+  };
+  const lineOrder = samples.map((_, i) => i).filter(i => i !== hookIdx);
+  let li = 0;
+  const hook = prep[hookIdx], hc = hook.ch;
+  let nextFree = 0, hookBusy = 0;
+  for (let b = 0; b < nBars; b++) {
+    const s = secAt[b], t = T0 + b * bar;
+    if (s.k === 'verse' && b >= nextFree && s.i % 2 === 0) {
+      const k = lineOrder[li++ % lineOrder.length], p = prep[k];
+      let start = t;
+      if (R() < .35 && p.ch[0]) { const [c0, c1] = p.ch[0]; const cut = Math.min(c1, c0 + .25); sayAt(k, t - beat, { from: c0, to: cut, gain: .9, layer: 'lines' }); sayAt(k, t - beat / 2, { from: c0, to: cut, gain: .9, layer: 'lines' }); } // stutter pickup: "I-I-"
+      sayAt(k, start, { echoTail: R() < .6 });
+      nextFree = b + Math.max(2, Math.ceil((p.dur + .2) / bar));
+    }
+    if (s.k === 'hook' && t >= hookBusy) {
+      const full = s.i % (hook.dur > bar * 1.9 ? 4 : 2) === 0; if (full) hookBusy = t + hook.dur + .05; else hookBusy = t + bar;
+      if (full) { sayAt(hookIdx, t, { layer: 'hook', echoTail: s.i === s.n - 2 }); if (V > .5) sayAt(hookIdx, t + .018, { gain: .35 * V, pan: -.6, layer: 'hook' }); }
+      else { // chopped answer: first chunk twice, then later chunks on the beat
+        const c = hc; sayAt(hookIdx, t, { from: c[0][0], to: c[0][1], layer: 'hook' }); sayAt(hookIdx, t + beat * .5, { from: c[0][0], to: c[0][1], layer: 'hook' });
+        if (c[1]) sayAt(hookIdx, t + beat * 1.5, { from: c[1][0], to: c[1][1], layer: 'hook' });
+        const last = c[c.length - 1]; sayAt(hookIdx, t + beat * 2.5, { from: c.length > 2 ? c[c.length - 2][0] : last[0], to: last[1], layer: 'hook', echoTail: true });
+      }
+    }
+    if (s.k === 'intro' && s.i === 2) sayAt(hookIdx, t, { echoTail: true, layer: 'hook' });
+    if (s.k === 'outro' && s.i === 1) sayAt(lineOrder[li++ % lineOrder.length], t, { echoTail: true });
+  }
+  // ---------- scripted scratches: intro and the break ----------
+  const scratchAt = (t, pat, k = hookIdx) => { const p = prep[k], c = p.ch[0]; const sc = renderScratch(p.d, SR, pat, beat, Math.min(.35, c[1] - c[0] + .1), c[0]); const o = Math.floor(t * SR); for (let i = 0; i < sc.length; i++) add(vox, o + i, sc[i] * .9, (i / sc.length - .5) * .3); events.push({ t, d: sc.length / SR, layer: 'scratch' }); };
+  for (let b = 0; b < nBars; b++) { const s = secAt[b], t = T0 + b * bar;
+    if (s.k === 'intro' && s.i === 1) { scratchAt(t, 'baby'); scratchAt(t + beat * 2, 'chirp'); }
+    if (s.k === 'break') { scratchAt(t, s.i % 2 ? 'stretch' : 'baby', s.i < 2 ? hookIdx : lineOrder[s.i % lineOrder.length]); if (s.i % 2 === 0) scratchAt(t + beat * 2, 'chirp'); }
+  }
+
+  // ---------- mix: duck the music under the voice, lo-fi the breakbeat, echo + room ----------
+  onStatus?.('Mixing it so the tapes cut through…');
+  // vocal envelope → duck everything else ~5 dB (classic old-school "voice on top")
+  const envArr = new Float32Array(N); { let e = 0; for (let i = 0; i < N; i++) { const v = Math.abs(vox[0][i]) + Math.abs(vox[1][i]); e = v > e ? e + (v - e) * .01 : e * .99985; envArr[i] = Math.min(1, e * 3); } }
+  // SP-1200 style grit on the breakbeat: 12-bit, 26 kHz, plus crackle
+  const hold = Math.round(SR / 26040); for (let c = 0; c < 2; c++) { const d = brk[c]; let h = 0; for (let i = 0; i < N; i++) { if (i % hold === 0) h = Math.round(d[i] * 2048) / 2048; d[i] = h + (Math.random() < .0004 * D ? (Math.random() - .5) * .08 : 0); } }
+  // echo bus: dotted-eighth slapback repeats, in JS
+  { const dt = Math.floor(beat * .75 * SR); for (let c = 0; c < 2; c++) { const d = echo[c]; for (let i = dt; i < N; i++) d[i] += d[i - dt] * .5; } }
+  // kick sidechain: bass and music dip under every kick so it punches through
+  const kickDuck = new Float32Array(N).fill(1); for (const kt of kickTimes) { const o = Math.floor(kt * SR), n = Math.floor(SR * .14); for (let i = 0; i < n && o + i < N; i++) { const g = .55 + .45 * (i / n) ** 1.5; if (o + i >= 0) kickDuck[o + i] = Math.min(kickDuck[o + i], g); } }
+  const out = mk();
+  for (let c = 0; c < 2; c++) for (let i = 0; i < N; i++) {
+    const v = envArr[i], dr = drums[c][i] * 1.1 + brk[c][i] * 1.2;
+    const punch = dr + Math.tanh(dr * 3.5) * .35; // parallel "smash" for weight
+    out[c][i] = punch * (1 - .2 * v) + (bass[c][i] * .7 + music[c][i] * .55) * (1 - .5 * v) * kickDuck[i] + vox[c][i] * 1.4 + echo[c][i] * .35 * (c ? 1 : .8);
+  }
+  // short room reverb via Web Audio for vocals + snares
+  const ctx = new OfflineAudioContext({ numberOfChannels: 2, length: N, sampleRate: SR });
+  const irLen = Math.floor(SR * lerp(.8, 1.6, 1 - V)); const ir = ctx.createBuffer(2, irLen, SR); for (let c = 0; c < 2; c++) { const d = ir.getChannelData(c); for (let i = 0; i < irLen; i++) d[i] = noise() * Math.pow(1 - i / irLen, 3); }
+  const cv = ctx.createConvolver(); cv.buffer = ir; const vg = ctx.createGain(); vg.gain.value = .5; cv.connect(vg); vg.connect(ctx.destination);
+  const src = (pair, dest) => { const b = ctx.createBuffer(2, N, SR); b.copyToChannel(pair[0], 0); b.copyToChannel(pair[1], 1); const s = ctx.createBufferSource(); s.buffer = b; s.connect(dest); s.start(0); };
+  for (let c = 0; c < 2; c++) for (let i = 0; i < N; i++) verb[c][i] += (drums[c][i] + brk[c][i]) * .05;
+  src(out, ctx.destination); src(verb, cv);
+  onStatus?.('Pressing the record…');
+  const buf = await ctx.startRendering();
+  let peak = 0; for (let c = 0; c < 2; c++) { const d = buf.getChannelData(c); for (let i = 0; i < d.length; i++) peak = Math.max(peak, Math.abs(d[i])); }
+  const k = .9 / (peak || 1), fadeN = SR * 2.5; for (let c = 0; c < 2; c++) { const d = buf.getChannelData(c); for (let i = 0; i < d.length; i++) { d[i] = Math.tanh(d[i] * k * 1.2) / Math.tanh(1.2); const r = d.length - i; if (r < fadeN) d[i] *= r / fadeN; } }
+  const sectionStarts = []; { let b = 0; for (const [, n] of SECTIONS) { sectionStarts.push(T0 + b * bar); b += n; } }
+  return { buffer: buf, events, bpm, beat, T0, length: L, rootMidi, hookIdx, sectionStarts };
+}
+
+// ===================== TRICKY DICK MC: UI =====================
+const $ = id => document.getElementById(id);
+const escH = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const fmt = s => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+const pickR = a => a[Math.floor(Math.random() * a.length)];
+
+// themed ends for each slider; one pair per slider is drawn each visit
+const DIALS = {
+  tempo: [['Filibuster', 'Break-in'], ['Executive session', 'Getaway car'], ['Stonewalling', 'Hot pursuit'], ['Slow leak', 'Full blowout'], ['Recess', 'Motorcade']],
+  bass: [['Deep Throat', 'Loose lips'], ['Bunker', 'Ballroom'], ['Low profile', 'Grandstand'], ['Basement tapes', 'Rose Garden party']],
+  vibe: [['Paranoid', 'Landslide'], ['Enemies list', 'Victory sign'], ['Smoking gun', 'Peace with honor'], ['Resignation', 'Re-election'], ['Plumbers', 'Party faithful']],
+  drums: [['Political machine', 'Grassroots'], ['Bugged', 'Unplugged'], ['Teletype', 'Jukebox'], ['Dictaphone', 'Dusty vinyl'], ['Mainframe', 'Block party']],
+};
+const TAGLINES = ["I am not a crook. I'm an MC.", 'On the mic from the Oval Office.', 'Expletives not deleted.', 'Live and direct from the White House tapes.', 'Follow the bassline.'];
+const dial = { tempo: .35, bass: .4, vibe: .45, drums: .65 };
+const LAYERS = [['hook', 'Hook', '#f2cd5c'], ['lines', 'Tape lines', '#f1ead8'], ['scratch', 'Scratches', '#d2402f'], ['beat', 'Beat', '#6f9ce0'], ['bass', 'Bassline', '#8f7fd8'], ['stabs', 'Stabs & keys', '#56b49b']];
+let samples = [], hookIdx = 0, result = null, seed = 0, player = null, gatherJob = 0;
+
+$('tagline').textContent = pickR(TAGLINES);
+$('legend').innerHTML = LAYERS.map(([, n, c]) => `<span style="--c:${c}">${n}</span>`).join('');
+$('knobs').innerHTML = Object.keys(DIALS).map(k => { const [a, b] = pickR(DIALS[k]); return `<div class="slider"><span>${a}</span><input id="${k}" type="range" min="0" max="1" step="any" value="${dial[k]}" aria-label="${a} to ${b}"><span>${b}</span></div>`; }).join('');
+Object.keys(dial).forEach(k => $(k).addEventListener('input', e => dial[k] = +e.target.value));
+function setStatus(t, err) { $('status').textContent = t; $('status').className = err ? 'err' : ''; }
+
+// ---------- the tapes ----------
+const quoteFmt = s => `“${escH(s.show)},” <span class="when">${escH(s.date || 'date unknown')}.</span>`;
+function context(s) { const d = s.tape.desc.replace(/^On [^,]+, \d{4}, /, '').split(/(?<![A-Z])\.\s/)[0].replace(/\s+(from|at|between)\s+(an unknown time|\d).*$/, ''); return d.length > 110 ? d.slice(0, 108) + '…' : d; }
+function renderTapes() {
+  const cards = [];
+  for (let i = 0; i < 6; i++) {
+    const s = samples[i];
+    if (!s) { cards.push(`<div class="skel">${i === samples.length ? 'Listening to the tapes…' : 'Waiting…'}</div>`); continue; }
+    cards.push(`<article class="tape ${i === hookIdx ? 'hook' : ''}" data-i="${i}"><span class="num">${i + 1}</span>
+      <div><q>${quoteFmt(s)}</q></div>
+      <div class="ctx">${s.speech ? `<b>Speech</b> · <a href="${escH(s.tape.page)}" target="_blank" rel="noopener">${escH(s.tape.title)}</a>` : `${escH(context(s))}${context(s) ? ' · ' : ''}<a href="${escH(s.tape.page)}" target="_blank" rel="noopener">${escH(s.tape.title)}</a>`}</div>
+      <div class="acts"><button class="chip" type="button" data-play="${i}">▶ Play</button><button class="chip ${i === hookIdx ? 'on' : ''}" type="button" data-hook="${i}">${i === hookIdx ? '★ The hook' : 'Make it the hook'}</button></div></article>`);
+  }
+  $('tapes').innerHTML = cards.join('');
+}
+$('tapes').addEventListener('click', e => {
+  const p = e.target.closest('[data-play]'), h = e.target.closest('[data-hook]');
+  if (p) previewSample(+p.dataset.play);
+  if (h) { hookIdx = +h.dataset.hook; renderTapes(); }
+});
+function previewSample(i) { const ctx = decodeCtx; ctx.resume(); const s = ctx.createBufferSource(); s.buffer = samples[i].buf; s.connect(ctx.destination); s.start(); flashCard(i, samples[i].buf.duration); }
+function flashCard(i, dur) { const el = document.querySelector(`.tape[data-i="${i}"]`); if (!el) return; el.classList.add('live'); setTimeout(() => el.classList.remove('live'), dur * 1000); }
+function bestHook() { let best = 0, sc = -1e9; samples.forEach((s, i) => { const v = -Math.abs(s.words - 5) - s.buf.duration * .4 + (s.iconic ? 6 : 0); if (v > sc) { sc = v; best = i; } }); return best; }
+
+async function loadTapes() {
+  const job = ++gatherJob; samples = []; hookIdx = 0; renderTapes(); $('compose').disabled = true; $('newTapes').disabled = true;
+  try {
+    await gatherSamples((s, i) => { if (job !== gatherJob) return; samples[i] = s; hookIdx = bestHook(); renderTapes(); }, t => job === gatherJob && setStatus(t));
+    if (job !== gatherJob) return;
+    renderTapes(); setStatus(`${samples.length} lines ready. Set the dials and press the record.`); $('compose').disabled = false;
+  } catch (e) { if (job === gatherJob) { setStatus(e.message, true); if (samples.length >= 3) $('compose').disabled = false; renderTapes(); } }
+  finally { if (job === gatherJob) $('newTapes').disabled = false; }
+}
+$('newTapes').addEventListener('click', loadTapes);
+
+// ---------- pressing the record ----------
+function titleOf(s) { const w = s.show.split(/\s+/); const t = w.length <= 6 ? s.show : (titleFrom(s.text) || s.show); return t.replace(/\b([a-z])/g, (m, c, i) => c.toUpperCase()).replace(/\[Expletive Deleted\]/, '[Expletive Deleted]'); }
+async function press(newSeed) {
+  if (samples.length < 3) return;
+  stop(); ['compose', 'vary', 'wav', 'play'].forEach(id => $(id).disabled = true);
+  if (newSeed || !seed) seed = Math.floor(Math.random() * 1e9);
+  try {
+    const t0 = performance.now();
+    result = await composeRap(samples, hookIdx, { ...dial, seed }, setStatus);
+    result.title = titleOf(samples[hookIdx]);
+    $('trackTitle').textContent = result.title;
+    $('trackSub').textContent = `Tricky Dick MC · ${result.bpm} bpm · ${fmt(result.length)}`;
+    $('credits').innerHTML = `Samples: ${[...new Map(samples.map(s => [s.tape.page, s])).values()].map(s => `<a href="${escH(s.tape.page)}" target="_blank" rel="noopener">${escH(s.tape.title)}</a> (${escH(s.date || 'undated')})`).join(' · ')}. Nixon White House tapes, public domain, via the National Archives and Wikimedia Commons. Transcriptions are machine-made and may mishear.`;
+    setStatus(`Pressed in ${((performance.now() - t0) / 1000).toFixed(1)} s. Hit play, then work the pads.`);
+    peaks = null; draw(0); ['play', 'vary', 'wav'].forEach(id => $(id).disabled = false);
+  } catch (e) { console.error(e); setStatus(e.message || 'Something went wrong pressing the record.', true); }
+  finally { $('compose').disabled = false; }
+}
+$('compose').addEventListener('click', () => press(true));
+$('vary').addEventListener('click', () => press(true));
+
+// ---------- playback + live pads ----------
+function trackPos() { return player ? player.ctx.currentTime - player.t0 : 0; }
+function stop() { if (player) { try { player.src.stop(); } catch { } cancelAnimationFrame(player.raf); player = null; } $('play').textContent = '▶ Play'; $('titlebar').classList.remove('spinning'); }
+function start(at = 0) {
+  stop(); const ctx = decodeCtx; ctx.resume();
+  const main = ctx.createGain(); main.connect(ctx.destination);
+  const src = ctx.createBufferSource(); src.buffer = result.buffer; src.connect(main); src.start(0, at);
+  player = { src, main, ctx, t0: ctx.currentTime - at }; $('play').textContent = '■ Stop'; $('titlebar').classList.add('spinning');
+  src.onended = () => { if (player?.src === src) { stop(); draw(0); } };
+  const tick = () => { if (!player) return; draw(trackPos()); player.raf = requestAnimationFrame(tick); }; tick();
+}
+$('play').addEventListener('click', () => player ? (stop(), draw(0)) : start(0));
+$('tl').addEventListener('click', e => { if (!result) return; const r = e.target.getBoundingClientRect(); start((e.clientX - r.left) / r.width * result.buffer.duration); });
+
+// when to land a pad: next half-beat while playing, right away otherwise
+function landing() {
+  const ctx = decodeCtx; ctx.resume();
+  if (!player || !result) return { when: ctx.currentTime + .02, beat: result ? result.beat : .65 };
+  const pos = trackPos(), x = (pos - result.T0) / result.beat, next = Math.ceil(x * 2 + .05) / 2;
+  return { when: player.t0 + result.T0 + next * result.beat, beat: result.beat };
+}
+function duckFor(when, dur) { if (!player) return; const g = player.main.gain; g.cancelScheduledValues(when - .05); g.setTargetAtTime(.5, when - .01, .015); g.setTargetAtTime(1, when + dur, .08); }
+function playBuf(data, when, gain = 1) { const ctx = decodeCtx; const b = ctx.createBuffer(1, data.length, SR); b.copyToChannel(data, 0); const s = ctx.createBufferSource(); s.buffer = b; const g = ctx.createGain(); g.gain.value = gain; s.connect(g); g.connect(ctx.destination); s.start(when); return b.duration; }
+function lastHeard() { // the most recent tape line in the track, else the hook
+  if (!player || !result) return hookIdx; const pos = trackPos(); let k = hookIdx, best = -1;
+  for (const ev of result.events) if (ev.k != null && ev.t <= pos && ev.t > best) { best = ev.t; k = ev.k; } return k;
+}
+const norm = d => d; // samples are already cleaned and normalized
+function scratch(kind, btn) {
+  if (!samples.length) return; hit(btn);
+  const k = lastHeard(), s = samples[k], c = chunks(s.buf)[0], { when, beat } = landing();
+  const data = renderScratch(norm(s.buf.getChannelData(0)), SR, kind, beat, Math.min(.35, c[1] - c[0] + .1), c[0]);
+  const dur = playBuf(data, when, 1.1); duckFor(when, dur); setTimeout(() => flashCard(k, dur), Math.max(0, (when - decodeCtx.currentTime) * 1000));
+}
+function hit(btn) { if (!btn) return; btn.classList.add('hit'); setTimeout(() => btn.classList.remove('hit'), 140); }
+function playStereo(L, R, when, gain = 1) { const ctx = decodeCtx; const b = ctx.createBuffer(2, L.length, SR); b.copyToChannel(L, 0); b.copyToChannel(R, 1); const s = ctx.createBufferSource(); s.buffer = b; const g = ctx.createGain(); g.gain.value = gain; s.connect(g); g.connect(ctx.destination); s.start(when); return b.duration; }
+function fx(kind, btn) {
+  if (!result && kind === 'rewind') return; hit(btn);
+  if (kind === 'rewind') { // spin back, then drop the record in again from the top of this section
+    if (!player) return; const pos = trackPos(), [L, R] = fxRewind(result.buffer, pos), now = decodeCtx.currentTime;
+    const back = [...result.sectionStarts].reverse().find(t => t < pos - .5) ?? 0;
+    player.main.gain.setValueAtTime(0, now + .01); playStereo(L, R, now + .01, 1);
+    setTimeout(() => start(back), L.length / SR * 1000); return;
+  }
+  const { when, beat } = landing(); const data = kind === 'siren' ? fxSiren(beat) : kind === 'horn' ? fxAirhorn(beat) : fxLaser(beat);
+  const dur = playBuf(data, when, .9); if (player) { const g = player.main.gain; g.cancelScheduledValues(when - .05); g.setTargetAtTime(.8, when, .02); g.setTargetAtTime(1, when + dur * .6, .1); }
+}
+document.querySelectorAll('[data-scratch]').forEach(b => b.addEventListener('click', () => scratch(b.dataset.scratch, b)));
+document.querySelectorAll('[data-fx]').forEach(b => b.addEventListener('click', () => fx(b.dataset.fx, b)));
+const KEYS = { z: ['scratch', 'baby'], x: ['scratch', 'stretch'], c: ['scratch', 'chirp'], v: ['scratch', 'flare'], b: ['scratch', 'scribble'], n: ['scratch', 'tear'], 1: ['fx', 'siren'], 2: ['fx', 'horn'], 3: ['fx', 'laser'], 4: ['fx', 'rewind'] };
+document.addEventListener('keydown', e => {
+  if (e.target.closest('input, textarea') || e.metaKey || e.ctrlKey || e.altKey || e.repeat) return;
+  const key = e.key.toLowerCase(), m = KEYS[key];
+  if (m) { const btn = document.querySelector(`[data-${m[0]}="${m[1]}"]`); m[0] === 'scratch' ? scratch(m[1], btn) : fx(m[1], btn); }
+  else if (key === ' ' && result && e.target === document.body) { e.preventDefault(); player ? (stop(), draw(0)) : start(0); }
+});
+$('wav').addEventListener('click', () => {
+  const a = document.createElement('a'); a.href = URL.createObjectURL(toWav(result.buffer));
+  a.download = `tricky-dick-mc-${(result.title || 'untitled').replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '').toLowerCase()}-${result.bpm}bpm.wav`;
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+});
+
+// ---------- timeline ----------
+let peaks = null;
+function draw(pos) {
+  const c = $('tl'), g = c.getContext('2d'), Wd = c.width, Ht = c.height; g.clearRect(0, 0, Wd, Ht);
+  const laneTop = 14, laneH = 24, waveTop = laneTop + LAYERS.length * laneH + 10, waveH = Ht - waveTop - 8;
+  if (!result) { g.fillStyle = '#a8b2cc'; g.font = '24px "Courier Prime", monospace'; g.textAlign = 'center'; g.fillText('No record pressed yet.', Wd / 2, Ht / 2); return; }
+  const L = result.buffer.duration, x = t => t / L * Wd;
+  LAYERS.forEach(([k, , col], i) => { const y = laneTop + i * laneH; g.fillStyle = 'rgba(255,255,255,.035)'; g.fillRect(0, y, Wd, laneH - 6); g.fillStyle = col; for (const ev of result.events) if (ev.layer === k) g.fillRect(x(ev.t), y + 2, Math.max(2, x(ev.d)), laneH - 10); });
+  if (!peaks) { const d0 = result.buffer.getChannelData(0), step = Math.floor(d0.length / Wd); peaks = new Float32Array(Wd); for (let i = 0; i < Wd; i++) { let m = 0; for (let k = i * step; k < (i + 1) * step; k += 8) m = Math.max(m, Math.abs(d0[k])); peaks[i] = m; } }
+  const mid = waveTop + waveH / 2;
+  for (let i = 0; i < Wd; i++) { g.fillStyle = i < x(pos) ? '#f2cd5c' : '#3a4d80'; const h = peaks[i] * waveH; g.fillRect(i, mid - h / 2, 1, Math.max(1, h)); }
+  if (pos > 0) { g.fillStyle = '#d2402f'; g.fillRect(x(pos) - 1, 0, 3, Ht); }
+  $('time').textContent = `${fmt(pos)} / ${fmt(L)}`;
+}
+draw(0);
+loadTapes();
+
+</script>
+</body>
+</html>
